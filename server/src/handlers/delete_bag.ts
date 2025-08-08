@@ -1,8 +1,19 @@
+import { db } from '../db';
+import { bagsTable } from '../db/schema';
 import { type DeleteBagInput } from '../schema';
+import { eq } from 'drizzle-orm';
 
-export async function deleteBag(input: DeleteBagInput): Promise<boolean> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is deleting a bag from the database by ID.
-    // Returns true if deletion was successful, false if bag was not found.
-    return false;
-}
+export const deleteBag = async (input: DeleteBagInput): Promise<boolean> => {
+  try {
+    // Delete the bag with the specified ID
+    const result = await db.delete(bagsTable)
+      .where(eq(bagsTable.id, input.id))
+      .execute();
+
+    // Check if any rows were affected (bag existed and was deleted)
+    return result.rowCount !== null && result.rowCount > 0;
+  } catch (error) {
+    console.error('Bag deletion failed:', error);
+    throw error;
+  }
+};
